@@ -1,0 +1,4 @@
+.vagrant
+.DS_Store
+shack/squid3
+shack/registry-dev
