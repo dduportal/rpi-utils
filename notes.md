@@ -87,10 +87,10 @@ Simple as a ```sudo reboot```
 We'll have 6 steps :
 * [Understand discovery](./notes.md#a---understand-discovery)
 * [Bootstrap consul cluster](./notes.md#b---bootstrap-consul-cluster)
-* [Launch consul local agent](./notes.md#c-launch-consul-local-agent)
-* [Launching swarm nodes](./notes.md#d-launching-swarm-nodes)
-* [Launch the swarm manager](./notes.md#e-launch-the-swarm-manager)
-* [Profit !](./notes.md#f-profit)
+* [Launch consul local agent](./notes.md#c---launch-consul-local-agent)
+* [Launching swarm nodes](./notes.md#d---launching-swarm-nodes)
+* [Launch the swarm manager](./notes.md#e---launch-the-swarm-manager)
+* [Profit !](./notes.md#f---profit-)
 
 ### a - Understand Discovery
 
