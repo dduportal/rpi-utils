@@ -82,7 +82,15 @@ Simple as a ```sudo reboot```
 * The docker clients will dial with this "manager" instead of dialing with Docker's engines
 * Since it knows all the cluster's node, the "manager" will schedule your containers somewhere, dependening on a set of rules.
 
-### How 
+### How ?
+
+We'll have 6 steps :
+* [Understand discovery](./notes.md#a---understand-discovery)
+* [Bootstrap consul cluster](./notes.md#b---bootstrap-consul-cluster)
+* [Launch consul local agent](./notes.md#c-launch-consul-local-agent)
+* [Launching swarm nodes](./notes.md#d-launching-swarm-nodes)
+* [Launch the swarm manager](./notes.md#e-launch-the-swarm-manager)
+* [Profit !](./notes.md#f-profit)
 
 ### a - Understand Discovery
 
@@ -117,7 +125,7 @@ $ consul agent -server -bootstrap-expect 1 -advertise YOURIP -data-dir /tmp/cons
 
 You can access the Web UI, on the shack machine only, on [http://localhost:8500/ui](http://localhost:8500/ui), to visualize your Consul's cluster.
 
-### c - Each Rpi node : launch consul local agent
+### c - Launch consul local agent
 
 Each node will have a local consul agent, connected to the global Consul's cluster.
 
