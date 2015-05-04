@@ -64,4 +64,37 @@ Note to use your custom values for :
 
 Simple as a ```sudo reboot```
 
-## TODO...
+
+## 3 - Run basic Docker commands
+
+## 4 - Play with Docker-compose
+
+## 5 - Create Docker Swarm cluster
+
+### Why ?
+
+* If my Docker's Engine goes down, I want to run my containers on another engine,
+* I want to run my container on the "right" engine, on my set of different servers.  
+
+### What ?
+
+* A webservice (the "swarm manager") will act as "application proxy".
+* The docker clients will dial with this "manager" instead of dialing with Docker's engines
+* Since it knows all the cluster's node, the "manager" will schedule your containers somewhere, dependening on a set of rules.
+
+### How 
+
+#### a - Discovery
+
+As [stated by the Swarm's documentation](https://docs.docker.com/swarm/discovery/), we have different "discovering systems".
+* "Docker Hub base" : this is the default one. Each node will contact the Docker Hub (external service) to register itself thru a unique token.
+* "Static discovery" : just provide the list of node to your swarm manager. Hey come on, we're in 2015 !
+* "3rd party discovery" : Swarm will just use a 3rd party system to store its knowledge of the cluster
+
+We're gonna use the **"consul based discovery"** (which a 3rd party system)
+
+#### b - Bootstrap consul cluster
+
+## 6 - Putting it together
+
+
