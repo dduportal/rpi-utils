@@ -67,6 +67,42 @@ Simple as a ```sudo reboot```
 
 ## 3 - Run basic Docker commands
 
+### Images and containers
+
+* Images are just tar files, which are sets of other tar file. They are filesystem images. You can see which images you have with :
+```bash
+$ docker images
+```
+
+* Get new images with :
+```bash
+$ docker pull IMAGENAME
+```
+* Both images and containers have an UID in Hash64, AND a name which is a string
+	* Images naming convention :
+	  * Complete name is ```REPOSITORY:TAG```. Examples : 
+	    * ```debian:wheezy```
+	    * ```python:2.7```
+	  * If no tag is supplied, Docker will use *latest*. Example : 
+	    * ```busybox``` is exactly the same than ```busybox:latest```
+	  * Images come from [Docker Hub](https://registry.hub.docker.com), unless you add the address of your own registry with a ```/``` separator. Examples : 
+	    * ```registry.priv.org/my-app:latest```
+	    * ```192.168.1.1:5000/arm-redis:0.3.0```
+	  * You can use a namespace with a ```/``` separator before "REPOSITORY". Examples :
+	    * ```ddupportal/arm-swarm:0.2.0```
+	    * ```registry.priv.org/entity/my-jboss:latest```
+	* Containers naming : [See that class :)](https://github.com/docker/docker/blob/master/pkg/namesgenerator/names-generator.go)
+
+* Containers are the running entities that start from images. You can see which containers are (or have been) running on your system with :
+```bash
+$ docker ps # -a for all
+```
+* You can inspect images AND containers metadatas, providing UID or name to this unique command. JSON response expected :
+```bash
+$ docker inspect UID/or/NAME
+```
+
+
 ## 4 - Play with Docker-compose
 
 ## 5 - Create Docker Swarm cluster
