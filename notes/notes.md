@@ -5,11 +5,11 @@ This page describes the main scenario for running the experiment
 
 ## 1 - Boot2Raspberry
 
-First of all, we have to install a working OS to an SD-Card and boot on it.
+First of all, we have to "dump" a working OS to an SD-Card and boot on it.
 
 You'll find [here](http://blog.hypriot.com/downloads/) a set of [Rapsbian](http://www.raspbian.org) and Docker-ready images :
 * Dowload the latest one (When writing this : ```hypriot-rpi-20150416-201537.img.zip```, based on jessie, with Docker 1.6.0)
-* Install it on your SD/Micro-SD card using these [Mac OS / Windows / Linux instructions](http://computers.tutsplus.com/articles/how-to-flash-an-sd-card-for-raspberry-pi--mac-53600)
+* Dump it on your SD/Micro-SD card using these [Mac OS / Windows / Linux instructions](http://computers.tutsplus.com/articles/how-to-flash-an-sd-card-for-raspberry-pi--mac-53600)
 
 
 ## 2 - Pre-configuration of raspberries
@@ -29,7 +29,7 @@ hostname=your-name
 # wifi_password=your-presharedkey
 ```
 
-Note that a reboot is required to activate it. We'll do that at the end of the pre-configurations.
+Note that a reboot is required. We'll do that at the end of the pre-configurations.
 
 ### b - Ensure your packages are up-to-date
 
