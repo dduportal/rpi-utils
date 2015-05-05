@@ -139,92 +139,83 @@ bash-4.3 # ps aux | grep nginx
 
 * Containers lifecycle : See below the all lifecycle, implying Docker's sub-commands like ```start```, ```create```, etc. 
 
-![Docker's container lifecycle](http://g.gravizo.com/g?
-  digraph G {
-    Running [shape=box,style=filled,color="green"];
-    Created [shape=box,style=filled,color="orange"];
-    Paused [shape=box,style=filled,color="orange"];
-    Stopped [shape=box,style=filled,color="orange"];
-    Killed [shape=box,style=filled,color="red"];
-    Running -> Paused [label="pause"];
-    Running -> Stopped [label="stop"];
-    Running -> Killed [label="kill"];
-    Paused -> Running [label="unpause"];
-    Stopped -> Running [label="restart"];
-    Created -> Running [label="create"];
-  }
-)
+![Docker's container lifecycle](./graphs/docker_containers_lifecycle.png)
 
 ### Containers network
 
-* Default behaviour of Docker is to create a network stack for each container, and connect them to a virtual network. Access is done thru the host's interface named "docker0". This is a simplified topology :
+* Default behaviour of Docker is to create a network stack for each container, and connect them to a virtual network. Access is done thru the host's interface named _docker0_ :
 
-![Docker network](http://g.gravizo.com/g?
-  digraph G {
-    subgraph cluster_0 {
-      label = "Host machine";
-      style=filled;
-      fillcolor=darkgreen;
-      fontcolor=white
-      docker_eng [style=filled,fillcolor=white,color=black,label="Docker engine"];
-      host_proc [style=filled,fillcolor=white,color=black,label="Host processes"];
-      subgraph cluster_0_0 {
-        label="Network stack";
-        fillcolor=grey;
-        fontcolor=white;
-        eth0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled];
-        l0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled];
-        docker0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled];
-      }
-      subgraph cluster_0_1 {
-        label = "Docker private network";
-        style=filled;
-        color=grey;
-        subgraph cluster_0_1_1 {
-          label = "Container 2";
-          style=filled;
-          fillcolor=navy;
-          c2_proc [style=filled,fillcolor=white,color=black,label="Container processes"];
-          subgraph cluster_0_1_1_0 {
-            label = "Network stack";
-            fillcolor=grey;
-            fontcolor=white;
-            c2_eth0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled,label="eth0"];
-            c2_l0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled,label="l0"];
-          }
-          c2_l0 -> c2_proc;
-          c2_proc -> c2_l0;
-        }
-        subgraph cluster_0_1_0 {
-          label = "Container 1";
-          style=filled;
-          fillcolor=navy;
-          c1_proc [style=filled,fillcolor=white,color=black,label="Container processes"];
-          subgraph cluster_0_1_0_0 {
-            label = "Network stack";
-            fillcolor=grey;
-            fontcolor=white;
-            c1_eth0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled,label="eth0"];
-            c1_l0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled,label="l0"];
-          }
-          c1_l0 -> c1_proc;
-          c1_proc -> c1_l0;
-        }
-      }
-      c1_eth0 -> docker0;
-      docker0 -> c1_eth0;
-      c2_eth0 -> docker0;
-      docker0 -> c2_eth0;
-      docker_eng -> docker0;
-      docker0 -> docker_eng;
-      host_proc -> l0;
-      l0 -> host_proc;
-    }
-    ext_net [style=filled,color=grey,label="External network"];
-    ext_net -> eth0;
-    eth0 -> ext_net;
-  }
-)
+![Docker network](./graphs/docker_net.png)
+
+* By default, you can access your container from the host or another local cotnainer, using the container's direct IP :
+```bash
+$ docker run -d --name webserver nginx:latest
+...
+$ docker inspect --format '{{ .NetworkSettings.IPAddress }}' webserver
+172.17.0.15
+$ curl -I --no-proxy='*' http://172.17.0.15
+...
+```
+
+* If you want to give external access to your container, the preferred way is to use port forwarding :
+  - 1st strategy is letting Docker select the port(s) to use :
+
+    ```bash
+    $ docker run --name=webserver -d -P nginx
+    ...
+    $ docker port webserver
+    80/tcp -> 0.0.0.0:PORT
+    443/tcp -> 0.0.0.0:PORT2
+    $ curl --noproxy='*' -I http://127.0.0.1:PORT
+    ...
+    ```
+
+  - 2nd is to specify the port (and the interface, and/or the level 3 protocol) to bind the forwarding to :
+
+    ```bash
+    $ docker run --name=webserver -d -p 80:10.0.2.15:10080 nginx
+    ...
+    $ docker port webserver
+    80/tcp -> 10.0.2.15:10080
+    $ curl --noproxy='*' -I http://10.0.2.15:10080
+    ...
+    ```
+
+* Anyway, [they are other networking configurations](https://docs.docker.com/reference/run/#network-settings), it's moving [a lot those times](http://socketplane.io/blog/socketplane-excited-to-be-joining-docker-to-collaborate-with-networking-ecosystem/) :
+  - Start a container on your host's network stack : 
+
+    ```bash
+    $ docker run --net=host ...
+    ```
+  - Start a container on another container's network stack : 
+
+    ```bash
+    $ docker run --net= container:ANOTHER_CONTAINER_ID ...
+    ```
+  - Start a container with no network : 
+
+    ```bash
+    $ docker run --net=none ...
+    ```
+  - Add custom DNS (host's ones will be use as fallback) : 
+
+    ```bash
+    $ docker run --dns 8.8.8.8 ...
+    ```
+
+* One powerful network functionnality of Docker is the "Containers linking". it allows 2 containers to know each others thru local DNS naming and environment variables :
+```bash
+$ docker run -d --name redissrv redis
+...
+$ docker run -ti --link redissrv:dbserver redis:3.0.0 env
+# <Have a look to this content>
+...
+$ docker run -ti --link redissrv:dbserver redis:3.0.0 redis-cli -h dbserver
+...
+```
+
+### Playing with data volumes
+
 
 ## 4 - Play with Docker-compose
 
