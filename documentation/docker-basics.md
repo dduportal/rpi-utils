@@ -152,4 +152,75 @@ $ docker run -ti --link redissrv:dbserver redis:3.0.0 redis-cli -h dbserver
 
 ## Build you own images
 
+* Docker use a "copy-on-write" underlying filesystem. Everything written inside a container is just a set of data blocks, virtualized as a "Linux Filesystem". We're talking about a stack of layers :
+
+![Docker layers](http://xebia.github.io/docker-introduction/slides/img/docker-filesystems-busyboxrw.png)
+
+```bash
+$ docker images --tree
+├─a8adec1c8256 Virtual Size: 4.93 MB Tags: dduportal/rpi-alpine:edge, dduportal/rpi-alpine:latest
+│ ├─d0fbd61239a1 Virtual Size: 4.931 MB
+│ │ └─f9774afcfa3c Virtual Size: 4.931 MB
+│ │   └─80bd603c6503 Virtual Size: 50.78 MB
+│ │     └─f4937bd913df Virtual Size: 56.93 MB
+│ │       └─e5319849a634 Virtual Size: 56.93 MB Tags: composetest_web:latest
+
+```
+
+* Manually create an image - **This is bad practise** :
+  1. run a container
+
+    ```bash
+    $ docker run -ti dduportal/rpi-alpine sh
+    ```
+
+  2. write something inside and terminate that container
+
+    ```bash
+    sh # echo "Hello" > /file.txt
+    sh # exit
+    $
+    ```
+
+  3. commit that container to create a new image (== a new set of layers)
+
+    ```bash
+    $ docker commit -m "Image with a new text file" JUST_TERMINATED_CONTAINER_ID myimage:1.0.0
+    ```
+
+  5. Run a new container based on the newly created image
+
+    ```bash
+    $ docker run myimage:1.0.0 cat /file.txt
+    Hello
+    $
+    ```
+
+* Automatize the image creation with a ```Dockerfile``` :
+
+```bash
+$ cat Dockerfile
+FROM dduportal/rpi-alpine:edge
+MAINTAINER your name here
+
+RUN echo "Hello" > /another_file.txt
+$ docker build -t myimage:2.0.0 ./
+...
+$ docker run myimage:2.0.0 cat /another_file.txt
+Hello
+```
+
+* You can re-tag and push your images to registry - **AGAIN : bad practise ALERT**
+```bash
+$ docker tag myimage:2.0.0 myusername/myimage:2.0.0
+...
+$ docker push myusername/myimage:2.0.0
+...
+```
+
 ## Playing with data volumes
+
+* Copy-on-write is Uber cool for building and sharing images. But it's willm tear down your I/Os !
+
+
+
