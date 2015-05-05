@@ -97,10 +97,48 @@ $ docker pull IMAGENAME
 ```bash
 $ docker ps # -a for all
 ```
-* You can inspect images AND containers metadatas, providing UID or name to this unique command. JSON response expected :
+
+* You can inspect images AND containers metadatas, providing UID or name to this unique command. :
 ```bash
 $ docker inspect UID/or/NAME
 ```
+
+### Running containers
+
+* We can have 3 differents type of container runs (from an image) :
+  - "One shot" running : run a single command and then exit :
+
+    ```
+	$ docker run debian:wheezy echo "Hello World !"
+	```
+  - "Interactive" : spawn a container and run a shell interactively inside :
+
+  
+    ```
+	$ docker run -ti debian:wheezy /bin/bash
+	```
+  - "Daemon" : launch a container in background :
+
+  
+    ```
+	$ docker run -d apache:2.4 /usr/bin/apache-ctl start
+	```
+
+* A container only have one command which is a simple Linux process. It can be specified at runtime or thru the images metadatas (default command) :
+```bash
+$ docker run -d redis:3.0.0
+```
+
+* Once a container hs been launched in background, you can spawn another process inside if you want to do some introspections tasks :
+```bash
+$ docker run --name webserver -d nginx
+...
+$ docker exec -ti webserver /bin/bash
+bash-4.3 # ps aux | grep nginx
+...
+```
+
+* Containers lifecycle : See below the all lifecycle, implying Docker's sub-commands like ```start```, ```create```, etc.
 
 
 ## 4 - Play with Docker-compose
