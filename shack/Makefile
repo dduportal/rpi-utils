@@ -1,10 +1,12 @@
-.PHONY: build start backup stop clean set_b2d_pat
+.PHONY: build start backup stop clean set_b2d_pat all
+
+all: clean set_b2d_pat build start
 
 build:
 	docker-compose build
 
-start: build
-	docker-compose up -d
+start: 
+	@docker-compose start || docker-compose up -d
 
 backup:
 	docker-compose run -T backup sh -x /backup.sh
