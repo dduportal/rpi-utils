@@ -137,21 +137,92 @@ bash-4.3 # ps aux | grep nginx
 ...
 ```
 
-* Containers lifecycle : See below the all lifecycle, implying Docker's sub-commands like ```start```, ```create```, etc.
+* Containers lifecycle : See below the all lifecycle, implying Docker's sub-commands like ```start```, ```create```, etc. 
 
 ![Docker's container lifecycle](http://g.gravizo.com/g?
   digraph G {
-  Running [shape=box,style=filled,color="green"]
-  Created [shape=box,style=filled,color="orange"]
-  Paused [shape=box,style=filled,color="orange"]
-  Stopped [shape=box,style=filled,color="orange"]
-  Killed [shape=box,style=filled,color="red"]
-  Running -> Paused [label="pause"];
-  Running -> Stopped [label="stop"];
-  Running -> Killed [label="kill"];
-  Paused -> Running [label="unpause"];
-  Stopped -> Running [label="restart"];
-  Created -> Running [label="create"];
+    Running [shape=box,style=filled,color="green"];
+    Created [shape=box,style=filled,color="orange"];
+    Paused [shape=box,style=filled,color="orange"];
+    Stopped [shape=box,style=filled,color="orange"];
+    Killed [shape=box,style=filled,color="red"];
+    Running -> Paused [label="pause"];
+    Running -> Stopped [label="stop"];
+    Running -> Killed [label="kill"];
+    Paused -> Running [label="unpause"];
+    Stopped -> Running [label="restart"];
+    Created -> Running [label="create"];
+  }
+)
+
+### Containers network
+
+* Default behaviour of Docker is to create a network stack for each container, and connect them to a virtual network. Access is done thru the host's interface named "docker0". This is a simplified topology :
+
+![Docker network](http://g.gravizo.com/g?
+  digraph G {
+    subgraph cluster_0 {
+      label = "Host machine";
+      style=filled;
+      fillcolor=darkgreen;
+      fontcolor=white
+      docker_eng [style=filled,fillcolor=white,color=black,label="Docker engine"];
+      host_proc [style=filled,fillcolor=white,color=black,label="Host processes"];
+      subgraph cluster_0_0 {
+        label="Network stack";
+        fillcolor=grey;
+        fontcolor=white;
+        eth0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled];
+        l0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled];
+        docker0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled];
+      }
+      subgraph cluster_0_1 {
+        label = "Docker private network";
+        style=filled;
+        color=grey;
+        subgraph cluster_0_1_1 {
+          label = "Container 2";
+          style=filled;
+          fillcolor=navy;
+          c2_proc [style=filled,fillcolor=white,color=black,label="Container processes"];
+          subgraph cluster_0_1_1_0 {
+            label = "Network stack";
+            fillcolor=grey;
+            fontcolor=white;
+            c2_eth0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled,label="eth0"];
+            c2_l0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled,label="l0"];
+          }
+          c2_l0 -> c2_proc;
+          c2_proc -> c2_l0;
+        }
+        subgraph cluster_0_1_0 {
+          label = "Container 1";
+          style=filled;
+          fillcolor=navy;
+          c1_proc [style=filled,fillcolor=white,color=black,label="Container processes"];
+          subgraph cluster_0_1_0_0 {
+            label = "Network stack";
+            fillcolor=grey;
+            fontcolor=white;
+            c1_eth0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled,label="eth0"];
+            c1_l0 [shape=diamond,fillcolor=sienna,fontcolor=white,style=filled,label="l0"];
+          }
+          c1_l0 -> c1_proc;
+          c1_proc -> c1_l0;
+        }
+      }
+      c1_eth0 -> docker0;
+      docker0 -> c1_eth0;
+      c2_eth0 -> docker0;
+      docker0 -> c2_eth0;
+      docker_eng -> docker0;
+      docker0 -> docker_eng;
+      host_proc -> l0;
+      l0 -> host_proc;
+    }
+    ext_net [style=filled,color=grey,label="External network"];
+    ext_net -> eth0;
+    eth0 -> ext_net;
   }
 )
 
