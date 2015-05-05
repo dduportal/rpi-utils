@@ -2,7 +2,6 @@
 
 This page describes the main scenario for running the experiment
 
-
 ## 1 - Boot2Raspberry
 
 First of all, we have to "dump" a working OS to an SD-Card and boot on it.
@@ -140,6 +139,21 @@ bash-4.3 # ps aux | grep nginx
 
 * Containers lifecycle : See below the all lifecycle, implying Docker's sub-commands like ```start```, ```create```, etc.
 
+![Docker's container lifecycle](http://g.gravizo.com/g?
+  digraph G {
+  Running [shape=box,style=filled,color="green"]
+  Created [shape=box,style=filled,color="orange"]
+  Paused [shape=box,style=filled,color="orange"]
+  Stopped [shape=box,style=filled,color="orange"]
+  Killed [shape=box,style=filled,color="red"]
+  Running -> Paused [label="pause"];
+  Running -> Stopped [label="stop"];
+  Running -> Killed [label="kill"];
+  Paused -> Running [label="unpause"];
+  Stopped -> Running [label="restart"];
+  Created -> Running [label="create"];
+  }
+)
 
 ## 4 - Play with Docker-compose
 
