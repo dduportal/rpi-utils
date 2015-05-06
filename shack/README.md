@@ -7,7 +7,7 @@
 * [Docker](https://docs.docker.com) 
 * [Docker compose](https://docs.docker.com/compose/)
 * [GNU Make](http://www.gnu.org/software/make/)
-* Internet access !
+* (unhindered) Internet access !
 
 ## How to use ?
 
@@ -16,7 +16,7 @@
 Just launch the ```make start```command, grab a coffee and let it run.
 It will build and start all your services.
 
-Then you're service are accessible thru you're Docker's host IP address :
+As a result, your services are accessible thru your Docker's host IP address :
 ```
 $ make start
 ...
@@ -38,25 +38,25 @@ You can stop all that with just :
 
 ### Data persistence
 
-It uses the pattern of the ["Data Volume Container"](https://docs.docker.com/userguide/dockervolumes/#creating-and-mounting-a-data-volume-container).
+This setup uses the ["Data Volume Container"](https://docs.docker.com/userguide/dockervolumes/#creating-and-mounting-a-data-volume-container) pattern.
 
-To persist, at your host-level, the inside data (proxy cached content, docker registry images) there is a command for that :
+To persist, from host-level, the container related data (proxy cached content, docker registry images), you can use the command :
 
 ```make backup```
 
-It will make a rsync-based backup of the data volume container locally.
+It will trigger a rsync-based backup of the data volume container locally.
 
 Pros :
-* This data will have a lifecycle bound to your host and not from docker-compose
-* You can reuse this data to another platform and make you own personnal and moveable cache
+* This data will have a host bound lifecycle and not influenced by the docker-compose start/stop cycles
+* You can reuse this data on another platform. It can become your own personnal and moveable cache
 
 Cons :
 * It makes things more complicated if you're a beginner
-* It will the ```make start``` slower (time of loading existing data)
+* It will make the ```make start``` slower (the time needed to load the existing data)
 
 ### Cleaning
 
-Be careful, if you clean without having backed up the data, you'll lose all your cache since it'll delete the Data Volumes from Docker.
+Warning, if you clean without having backed-up the data, you will lose all your cache since it will delete the Data Volumes from Docker.
 
 Just run ```make clean```
 
