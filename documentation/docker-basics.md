@@ -218,9 +218,29 @@ $ docker push myusername/myimage:2.0.0
 ...
 ```
 
+* **Good practises for building images**
+  - Think of testing you images BEFORE building it (What's inside ? What's the wanted behaviour ?)
+  - Implement testing with automated tools : [bats](https://github.com/sstephenson/bats), [serverspec](http://serverspec.org/), [cucumber with aruba](https://github.com/cucumber/aruba), etc.
+  - Use the [automated builds of Docker Hub](https://docs.docker.com/docker-hub/builds/) : your user have to knwo what's inside your images
+  - Be careful with the size of your images : [optimize](http://www.centurylinklabs.com/optimizing-docker-images/) and [squash](http://jasonwilder.com/blog/2014/08/19/squashing-docker-images/)
+  - Use Continous Integration : [DockerHub with automated builds](https://docs.docker.com/docker-hub/builds/), [CircleCi](https://circleci.com/), [TravisCI](https://travis-ci.org/), [Jenkins](https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin), etc.
+
 ## Playing with data volumes
 
-* Copy-on-write is Uber cool for building and sharing images. But it's willm tear down your I/Os !
+* Copy-on-write is UBER cool for building and sharing images. But it's will destroy your I/Os when doing a lot writes : logs, tmp dirs, database storage dirs...
+
+* There is a solution for that : [Docker's Data volumes](https://docs.docker.com/userguide/dockervolumes/). Tell Docker which path of your container are going to be "data volumes" :
+  - At image level : with the ```VOLUME``` instruction in the Dockerfile :
+
+     ```
+     $ cat Dockerfile
+     FROM centos:centos6
+     ...
+     VOLUME ["/var/log","/var/lib/mysql"]
+     ``` 
+  - At run time : with the ```-v``` switch of docker run command :
+
+    ```bahs
 
 
 
