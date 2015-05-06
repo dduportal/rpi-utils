@@ -1,11 +1,11 @@
-# Notes about Raspberry Pi Experiment
+# Notes about the Raspberry Pi Experiment
 
 This page contains the main scenario for running the experiment
 
 
 ## 1 - Boot2Raspberry
 
-First of all, we have to dump a working OS to an SD-Card and boot on it.
+First of all, we have to "dump" a working OS to an SD-Card and boot on it.
 
 You'll find [here](http://blog.hypriot.com/downloads/) a set of [Rapsbian](http://www.raspbian.org) and Docker-ready images :
 * Dowload the latest one (When writing this : ```hypriot-rpi-20150416-201537.img.zip```, based on jessie, with Docker 1.6.0)
@@ -16,7 +16,7 @@ You'll find [here](http://blog.hypriot.com/downloads/) a set of [Rapsbian](http:
 
 ### a - Set hostname
 
-Given that default name is black-pearl for all freshly booted images of Hypriot, we should set a custom hostname.
+Given that default name is "black-pearl" for all freshly booted Hypriot images of, we should set a custom hostname.
 
 Edit (as root) the file ```/boot/occidentalis.txt``` at the line beginning with ```hostname```:
 ```bash
@@ -29,7 +29,7 @@ hostname=your-name
 # wifi_password=your-presharedkey
 ```
 
-Note that this require a reboot to be visible. We'll do that at the end of pre-configurations
+Note that this requires a reboot to be visible. We will do that at the end of pre-configurations
 
 ### b - Ensure your packages are up-to-date
 
@@ -41,10 +41,12 @@ $ sudo apt-get update && sudo apt-get -y dist-upgrade
 
 ### c - Configure your Docker Daemon
 
-You'll find [here](https://docs.docker.com/reference/commandline/cli/#daemon) the Docker's reference documentation. We want to :
+You will find [here](https://docs.docker.com/reference/commandline/cli/#daemon) the Docker's reference documentation. 
+
+We want to :
 * Make the Daemon manageable from the outside world (e.g. bind it to a TCP socket)
 * Let the local Docker client access the daemon (e.g. explicit the Unix socket's binding)
-* Add some labels to this daemons for helping swarm to schedule things later
+* Add some labels to this daemon for helping swarm to schedule things later
 * Configure our local registry (allow insecure HTTP and enable mirroring)
 
 Edit (as root) the file ```/etc/default/docker```, on the line beginning with ```DOCKER_OPTS``` :
