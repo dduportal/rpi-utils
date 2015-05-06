@@ -1,5 +1,9 @@
 # Notes about the Raspberry Pi Experiment
 
+
+This page contains the main scenario for running the experiment
+
+
 ## 1 - Boot2Raspberry
 
 First of all, we have to "dump" a working OS to an SD-Card and boot on it.
@@ -25,6 +29,7 @@ hostname=your-name
 # wifi_ssid=your-ssid
 # wifi_password=your-presharedkey
 ```
+
 
 Note that a reboot is required. We will do that at the end of the pre-configurations.
 
