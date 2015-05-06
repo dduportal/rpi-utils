@@ -229,7 +229,7 @@ $ docker push myusername/myimage:2.0.0
 
 * Copy-on-write is UBER cool for building and sharing images. But it's will destroy your I/Os when doing a lot writes : logs, tmp dirs, database storage dirs...
 
-* There is a solution for that : [Docker's Data volumes](https://docs.docker.com/userguide/dockervolumes/). Tell Docker which path of your container are going to be "data volumes" :
+* There is a solution for that : [Docker's volumes](https://docs.docker.com/userguide/dockervolumes/). Tell Docker which path of your container are going to be "data volumes" :
   - At image level : with the ```VOLUME``` instruction in the Dockerfile :
 
      ```
@@ -240,7 +240,29 @@ $ docker push myusername/myimage:2.0.0
      ``` 
   - At run time : with the ```-v``` switch of docker run command :
 
-    ```bahs
+    ```bash
+    $ docker run -v /app debian:jessie /bin/bash
+    ```
 
+* A "volume" is a folder or a file which is "bind-mounted" from the host inside the container. So it:
+  - Won't be tracked down by the "copy-on-write" union filesystem
+  - Won't be shared thru commit / build / images
+  - Will have "host-native" I/Os performances
+  - Its lifecyle and content will be bound to the Host : your host goes down, your data too ! **Do not forget backup and sync. systems**
 
+* You can reach volume's content from your host :
+```bash
+$ docker run --name data-test -v /app busybox touch /app/file.txt
+$ docker inspect --format '{{ .Volumes }}' data-test
+map[/app:/mnt/sda2/var/lib/docker/vfs/dir/57b67b6f493a67daa1c617b4412a29a6e013833344b6e11139a0055014a797f1]
+$ sudo ls -l /mnt/sda2/var/lib/docker/vfs/dir/57b67b6f493a67daa1c617b4412a29a6e013833344b6e11139a0055014a797f1
+total 0
+-rw-r--r--    1 root     root             0 May  6 11:56 file.txt
+```
 
+* You can share data beetween containers with **no overhead** :
+```bash
+$ docker run --volumes-from data-test busybox ls -l /app
+total 0
+-rw-r--r--    1 root     root             0 May  6 11:56 file.txt
+```
