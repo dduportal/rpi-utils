@@ -266,3 +266,66 @@ $ docker run --volumes-from data-test busybox ls -l /app
 total 0
 -rw-r--r--    1 root     root             0 May  6 11:56 file.txt
 ```
+
+* You can share data from your host to your containers :
+```bash
+$ ls /DATAS
+dir1  dir2  file1 file2 file3
+$ docker run -v /DATAS:/app busybox ls /app
+dir1  dir2  file1 file2 file3
+``` 
+
+* The "Data container" : a one-shot container, just have to exists, don't need to run, see that like a "filer" :
+```bash
+$ docker run --name data -v /var/lib/mysql -v /var/log -v /var/www busybox true
+$ docker run --volumes-from data -d mysql:latest
+$ docker run --volumes-from data -d apache:latest
+```
+
+## Advanced Docker
+
+### Cleaning
+
+* Since a stopped container will still exists as a file system image and metadatas, you can delete them :
+```bash
+$ docker rm my_container
+```
+
+* If your container had data volumes associated, consider deleting them. Note that it will just unreference the container from the volume's metadatas if another container are using this volume.
+```bash
+$ docker run -v data-container
+```
+
+* Use the ```--rm``` switch with docker run with "one-shot" containers to auto-delete them after when it'll stop :
+```bash
+$ docker run --rm busybox echo "Hello"
+```
+
+* You can also delete images if no containers remains referencing it. Note that it will just untag if another tag refers to the same image :
+$ docker images
+my_app  1.0.0   ID1 ...
+my_app  2.0.0   ID2 ...
+my_app  latest  ID2 ...
+$ docker rmi my_app:1.0.0 my_app:2.0.0
+$ docker images
+my_app  latest  ID2 ...
+```
+
+* Terminators commands :
+  - Delete all containers existing on the host. (Running one will be ignored) :
+
+    ```bash
+    $ docker ps -a -q | xargs docker rm -v
+    ```
+
+  - Delete all images (referenced one won't be) :
+
+    ```bash
+    $ docker images -q | xargs docker rmi
+    ```
+
+### Logging
+
+* Each container's stdout will be written in a log file on the host level
+
+### Inceptions
