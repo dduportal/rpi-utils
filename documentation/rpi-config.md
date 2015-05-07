@@ -1,6 +1,6 @@
 # Pre-configuration of raspberries
 
-## a - Set hostname
+## Set hostname
 
 Seen that the default hostname is "black-pearl" for all freshly booted Hypriot images, we should set a custom one.
 
@@ -17,38 +17,30 @@ hostname=your-name
 
 Note that a reboot is required. We'll do that at the end of the pre-configurations.
 
-## b - Ensure your packages are up-to-date
+## Run the pre-configuration script
 
-Since we are on a debian jessie based OS, it's easy :
+The script will be downloaded and ran from the gateway :
 ```bash
-$ sudo apt-get update && sudo apt-get -y dist-upgrade
-...
+$ curl -L -o /tmp/pi-config.sh http://SHACK_IP/pi-config.sh
+$ sudo sh /tmp/pi-config.sh
 ```
 
-## c - Configure your Docker Daemon
-
-You'll find [here](https://docs.docker.com/reference/commandline/cli/#daemon) the Docker's reference documentation. We want to :
-* Make the daemon manageable from the outside world (e.g. bind it to a TCP socket)
-* Let the local Docker client access the daemon (e.g. explicit the Unix socket's binding)
-* Add some labels to this daemon to help Swarm schedule things later
-* Configure our local registry (allowing insecure HTTP and enabling mirroring)
-
-Edit (as root) the file ```/etc/default/docker```, on the line beginning with ```DOCKER_OPTS``` :
+Optionaly you can change the default gateway IP if 192.168.2.1 does not fit to your need ;
 ```bash
-$ grep DOCKER_OPTS /etc/default/docker
-...
-DOCKER_OPTS="--storage-driver=overlay -D -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock \
---label arch=YOURARCH --insecure-registry REGISTRY_IP:REGISTRY_PORT \
---registry-mirror=http://REGISTRY_IP:REGISTRY_PORT"
-``` 
+$ sudo sh /tmp/pi-config.sh 10.0.5.1 # Or whatever IP it is
+```
 
-Note to use your custom values for :
-* REGISTRY_IP : your IP (or domain name if you have a full DNS resolution) of a running registry
-* REGISTRY_PORT : port where your local registry is listening
-* YOURARCH : armv6 (RPis A and B, all revisions) or armv7 (Rpis v2)
+It should do :
+* Configuring apt-get to use an http caching proxy, located in the shack machine
+* Ensuring packages are up to date, in safe manner (no kernel update)
+* Install LXDE, git, curl and chromium for easying the session
+* Configure the Pi to use X interface by default
+* Pre-configure your docker daemon to :
+  - Use the "shack machine" as docker mirror registry
+  - Enable the HTTP protocol when using this private registry (instead of HTTP**S**)
+  - Listen to the 2375 port on all interfaces of your host
+* Disable verbose output of the kernel on the tty
 
-
-## d - Reboot your Raspberry
+## Reboot your Raspberry
 
 Simple as a ```sudo reboot```
-
