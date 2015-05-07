@@ -8,17 +8,13 @@
 $ docker images
 ```
 
-* Get new images with :
-```bash
-$ docker pull IMAGENAME
-```
 * Both images and containers have an UID in Hash64, AND a name which is a string
 	* Images naming convention :
 	  * Complete name is ```REPOSITORY:TAG```. Examples : 
 	    * ```debian:wheezy```
 	    * ```python:2.7```
 	  * If no tag is supplied, Docker will use *latest*. Example : 
-	    * ```busybox``` is exactly the same than ```busybox:latest```
+	    * ```dduportal/rpi-alpine``` is exactly the same than ```dduportal/rpi-alpine:latest```
 	  * Images come from [Docker Hub](https://registry.hub.docker.com), unless you add the address of your own registry with a ```/``` separator. Examples : 
 	    * ```registry.priv.org/my-app:latest```
 	    * ```192.168.1.1:5000/arm-redis:0.3.0```
@@ -26,6 +22,13 @@ $ docker pull IMAGENAME
 	    * ```ddupportal/arm-swarm:0.2.0```
 	    * ```registry.priv.org/entity/my-jboss:latest```
 	* Containers naming : [See that class :)](https://github.com/docker/docker/blob/master/pkg/namesgenerator/names-generator.go)
+
+* Get new images with :
+```bash
+$ docker pull IMAGENAME
+```
+
+Test by replacing IMAGENAME by ```dduportal/rpi-alpine:edge```
 
 * Containers are the running entities that start from images. You can see which containers are (or have been) running on your system with :
 ```bash
@@ -37,35 +40,37 @@ $ docker ps # -a for all
 $ docker inspect UID/or/NAME
 ```
 
+Test by replacing UID/or/NAME by ```dduportal/rpi-alpine:edge```
+
 ## Running containers
 
 * We can have 3 differents type of container runs (from an image) :
   - "One shot" running : run a single command and then exit :
 
     ```
-	$ docker run debian:wheezy echo "Hello World !"
+	$ docker run dduportal/rpi-alpine echo "Hello World !"
 	```
   - "Interactive" : spawn a container and run a shell interactively inside :
 
   
     ```
-	$ docker run -ti debian:wheezy /bin/bash
+	$ docker run -ti dduportal/rpi-alpine /bin/sh
 	```
   - "Daemon" : launch a container in background :
 
   
     ```
-	$ docker run -d apache:2.4 /usr/bin/apache-ctl start
+	$ docker run -d dduportal/arm-nginx /some/command -in background
 	```
 
 * A container only have one command which is a simple Linux process. It can be specified at runtime or thru the images metadatas (default command) :
 ```bash
-$ docker run -d redis:3.0.0
+$ docker run -d dduportal/arm-redis:3.0.0
 ```
 
 * Once a container hs been launched in background, you can spawn another process inside if you want to do some introspections tasks :
 ```bash
-$ docker run --name webserver -d nginx
+$ docker run --name webserver -d dduportal/arm-nginx
 ...
 $ docker exec -ti webserver /bin/bash
 bash-4.3 # ps aux | grep nginx
@@ -84,7 +89,7 @@ bash-4.3 # ps aux | grep nginx
 
 * By default, you can access your container from the host or another local cotnainer, using the container's direct IP :
 ```bash
-$ docker run -d --name webserver nginx:latest
+$ docker run -d --name webserver dduportal/arm-nginx:latest
 ...
 $ docker inspect --format '{{ .NetworkSettings.IPAddress }}' webserver
 172.17.0.15
@@ -92,27 +97,32 @@ $ curl -I --no-proxy='*' http://172.17.0.15
 ...
 ```
 
+* Which port to use ? Seach for "Expose" in
+```bash
+$ docker inspect dduportal/arm-nginx
+...
+
 * If you want to give external access to your container, the preferred way is to use port forwarding :
   - 1st strategy is letting Docker select the port(s) to use :
 
     ```bash
-    $ docker run --name=webserver -d -P nginx
+    $ docker run --name=webserver -d -P dduportal/arm-nginx
     ...
     $ docker port webserver
     80/tcp -> 0.0.0.0:PORT
     443/tcp -> 0.0.0.0:PORT2
-    $ curl --noproxy='*' -I http://127.0.0.1:PORT
+    $ curl -I http://127.0.0.1:PORT
     ...
     ```
 
   - 2nd is to specify the port (and the interface, and/or the level 3 protocol) to bind the forwarding to :
 
     ```bash
-    $ docker run --name=webserver -d -p 80:10.0.2.15:10080 nginx
+    $ docker run --name=webserver -d -p 80:10.0.2.15:10080 dduportal/arm-nginx
     ...
     $ docker port webserver
     80/tcp -> 10.0.2.15:10080
-    $ curl --noproxy='*' -I http://10.0.2.15:10080
+    $ curl -I http://10.0.2.15:10080
     ...
     ```
 
@@ -140,15 +150,18 @@ $ curl -I --no-proxy='*' http://172.17.0.15
 
 * One powerful network functionnality of Docker is the "Containers linking". it allows 2 containers to know each others thru local DNS naming and environment variables :
 ```bash
-$ docker run -d --name redissrv redis
+$ docker run -d --name redissrv dduportal/arm-redis:3.0.0
 ...
-$ docker run -ti --link redissrv:dbserver redis:3.0.0 env
+$ docker run -ti --link redissrv:dbserver dduportal/arm-redis:3.0.0 env
 # <Have a look to this content>
 ...
-$ docker run -ti --link redissrv:dbserver redis:3.0.0 redis-cli -h dbserver
+$ docker run -ti --link redissrv:dbserver dduportal/arm-redis:3.0.0 \
+  redis-cli -h dbserver -p 6378
 ...
 
 ```
+
+* Practical example : **The Redis Token Ring** . Connect a local redis-client to the redis server of your left neighbour.
 
 ## Build you own images
 
@@ -234,14 +247,14 @@ $ docker push myusername/myimage:2.0.0
 
      ```
      $ cat Dockerfile
-     FROM centos:centos6
+     FROM dduportal/rpi-alpine:edge
      ...
      VOLUME ["/var/log","/var/lib/mysql"]
      ``` 
   - At run time : with the ```-v``` switch of docker run command :
 
     ```bash
-    $ docker run -v /app debian:jessie /bin/bash
+    $ docker run -v /app dduportal/rpi-alpine:edge /bin/sh
     ```
 
 * A "volume" is a folder or a file which is "bind-mounted" from the host inside the container. So it:
@@ -252,7 +265,7 @@ $ docker push myusername/myimage:2.0.0
 
 * You can reach volume's content from your host :
 ```bash
-$ docker run --name data-test -v /app busybox touch /app/file.txt
+$ docker run --name data-test -v /app dduportal/rpi-alpine:edge touch /app/file.txt
 $ docker inspect --format '{{ .Volumes }}' data-test
 map[/app:/mnt/sda2/var/lib/docker/vfs/dir/57b67b6f493a67daa1c617b4412a29a6e013833344b6e11139a0055014a797f1]
 $ sudo ls -l /mnt/sda2/var/lib/docker/vfs/dir/57b67b6f493a67daa1c617b4412a29a6e013833344b6e11139a0055014a797f1
@@ -262,7 +275,7 @@ total 0
 
 * You can share data beetween containers with **no overhead** :
 ```bash
-$ docker run --volumes-from data-test busybox ls -l /app
+$ docker run --volumes-from data-test dduportal/rpi-alpine:edge ls -l /app
 total 0
 -rw-r--r--    1 root     root             0 May  6 11:56 file.txt
 ```
@@ -271,13 +284,13 @@ total 0
 ```bash
 $ ls /DATAS
 dir1  dir2  file1 file2 file3
-$ docker run -v /DATAS:/app busybox ls /app
+$ docker run -v /DATAS:/app dduportal/rpi-alpine:edge ls /app
 dir1  dir2  file1 file2 file3
 ``` 
 
 * The "Data container" : a one-shot container, just have to exists, don't need to run, see that like a "filer" :
 ```bash
-$ docker run --name data -v /var/lib/mysql -v /var/log -v /var/www busybox true
+$ docker run --name data -v /var/lib/mysql -v /var/log -v /var/www dduportal/rpi-alpine:edge true
 $ docker run --volumes-from data -d mysql:latest
 $ docker run --volumes-from data -d apache:latest
 ```
@@ -298,7 +311,7 @@ $ docker run -v data-container
 
 * Use the ```--rm``` switch with docker run with "one-shot" containers to auto-delete them after when it'll stop :
 ```bash
-$ docker run --rm busybox echo "Hello"
+$ docker run --rm dduportal/rpi-alpine:edge echo "Hello"
 ```
 
 * You can also delete images if no containers remains referencing it. Note that it will just untag if another tag refers to the same image :
@@ -328,7 +341,7 @@ my_app  latest  ID2 ...
 
 * Each container's stdout will be written in a log file on the host level :
 ```bash
-$ docker run -d busybox echo ok
+$ docker run -d dduportal/rpi-alpine:edge echo ok
 $ sudo cat /var/lib/docker/<CONT_ID>/log.json
 ```
 
@@ -366,6 +379,6 @@ $ docker -H tcp://ANOTHERIP:2375 ps
 ```bash
 $ which docker
 /usr/local/bin/docker
-$ docker run -v $(which docker):$(which docker) -v /var/run/docker.sock:/var/run/docker.sock busybox docker ps
+$ docker run -v $(which docker):$(which docker) -v /var/run/docker.sock:/var/run/docker.sock dduportal/rpi-alpine:edge docker ps
 ...
 ```
