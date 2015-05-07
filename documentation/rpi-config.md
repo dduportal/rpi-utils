@@ -37,7 +37,9 @@ Edit (as root) the file ```/etc/default/docker```, on the line beginning with ``
 ```bash
 $ grep DOCKER_OPTS /etc/default/docker
 ...
-DOCKER_OPTS="--storage-driver=overlay -D -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --label arch=YOURARCH --insecure-registry REGISTRY_IP:REGISTRY_PORT --registry-mirror=http://REGISTRY_IP:REGISTRY_PORT"
+DOCKER_OPTS="--storage-driver=overlay -D -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock \
+--label arch=YOURARCH --insecure-registry REGISTRY_IP:REGISTRY_PORT \
+--registry-mirror=http://REGISTRY_IP:REGISTRY_PORT"
 ``` 
 
 Note to use your custom values for :
