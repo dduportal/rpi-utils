@@ -6,6 +6,8 @@ Seen that the default hostname is "black-pearl" for all freshly booted Hypriot i
 
 Edit (as root) the file ```/boot/occidentalis.txt``` at the line beginning with ```hostname```:
 ```bash
+$ sudo vi /boot/occidentalis.txt
+...
 $ cat /boot/occidentalis.txt 
 # hostname for your Hypriot Raspberry Pi:
 hostname=your-name
