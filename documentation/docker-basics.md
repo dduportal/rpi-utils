@@ -326,6 +326,46 @@ my_app  latest  ID2 ...
 
 ### Logging
 
-* Each container's stdout will be written in a log file on the host level
+* Each container's stdout will be written in a log file on the host level :
+```bash
+$ docker run -d busybox echo ok
+$ sudo cat /var/lib/docker/<CONT_ID>/log.json
+```
 
-### Inceptions
+* There is docker command for that :
+```bash
+$ docker run -d --name dbserver redis
+$ docker logs (-f) dbserver
+```
+
+* This is the default behaviour but you can, since 1.6.0 you also can use :
+  - "no-logging" mode : better I/Os
+  - "syslog" driver, to log in a rsyslog collector
+  - more to come : plugin driver architecture. Write your own !
+
+### Client / server
+
+* Docker is "just" an HTTP server. It has a client and a server, communicating thru sockets (Unix and/or TCP), using the HTTP protocol at level 7. Note that the binary can act as client and server.
+
+* Given that the docker engine server expose a complete REST API, you can request it with any HTTP clien, and easily use docker client in java/python/go/ruby/etc.
+
+* You can manage a remote docker daemon, in remote servers, with a local client :
+```bash
+$ docker ps
+...
+$ docker -H tcp://ANOTHERIP:2375 ps
+...
+```
+
+* Default configuration :
+  - Locally, client and server dial thru the 
+
+### WTF ?
+
+* Inception !
+```bash
+$ which docker
+/usr/local/bin/docker
+$ docker run -v $(which docker):$(which docker) -v /var/run/docker.sock:/var/run/docker.sock busybox docker ps
+...
+```
