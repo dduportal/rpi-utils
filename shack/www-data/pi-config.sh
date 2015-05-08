@@ -4,8 +4,8 @@
 #	booted on hypriot ARMed image (http://blog.hypriot.com/downloads/).
 #	It is aimed to run the "rpi session" from github.com/dduportal.rpi-utils
 
-KBD_LAYOUT="fr"
-SHACK_IP=${1-192.168.2.1}
+KBD_LAYOUT=${1-fr}
+SHACK_IP=${2-192.168.2.1}
 
 set -e
 set -u
@@ -20,7 +20,7 @@ sudo apt-get install -y lxde git curl chromium
 
 # Disable (for tty) the kernel verbose messages
 sudo dmesg -n 1
-echo 'sudo dmesg -n 1' >> "/etc/rc.local"
+echo 'sudo dmesg -n 1' | sudo tee -a "/etc/rc.local"
 
 # Set  keyboard layout
 sudo sed -i 's/^XKBLAYOUT=.*$/XKBLAYOUT="'"${KBD_LAYOUT}"'"/g' /etc/default/keyboard

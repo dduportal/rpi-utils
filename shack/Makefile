@@ -6,7 +6,7 @@ build:
 	docker-compose build
 
 start: 
-	@docker-compose start || docker-compose up -d
+	docker-compose up -d
 
 backup:
 	docker-compose run -T backup sh -x /backup.sh

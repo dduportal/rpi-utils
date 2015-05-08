@@ -2,7 +2,6 @@ data:
   build: ./data/
   volumes:
     - ./:/host-datadir
-    - ./www-data:/usr/share/nginx/html:ro
 backup:
   build: ./data/
   command: true
@@ -10,8 +9,10 @@ backup:
     - data
 web:
   image: nginx:1.9.0
-  volumes_from:
-    - data
+  ports:
+    - "80:80"
+  volumes:
+    - ./www-data:/usr/share/nginx/html
 proxy:
   image: jpetazzo/squid-in-a-can:latest
   environment:
