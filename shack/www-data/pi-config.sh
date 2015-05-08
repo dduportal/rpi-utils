@@ -11,7 +11,7 @@ set -e
 set -u
 
 # Configure local proxy (supposing it is on the provided IP)
-echo 'Acquire::http::Proxy "http://${SHACK_IP}:3128";' | sudo tee /etc/apt/apt.conf.d/proxy
+echo "Acquire::http::Proxy \"http://${SHACK_IP}:3128\";" | sudo tee /etc/apt/apt.conf.d/proxy
 
 # Update and upgrade safely packages (no kernel update !)
 sudo apt-get update
