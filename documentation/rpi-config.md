@@ -27,9 +27,15 @@ $ curl -L -o /tmp/pi-config.sh http://SHACK_IP/pi-config.sh
 $ sudo sh /tmp/pi-config.sh
 ```
 
-Optionaly you can change the default gateway IP if 192.168.2.1 does not fit to your need ;
+Optionaly you can change provide some parameters to the script :
+1. First parameter is the keyboard layout to use. Default is ```fr``` :
 ```bash
-$ sudo sh /tmp/pi-config.sh 10.0.5.1 # Or whatever IP it is
+$ sudo sh /tmp/pi-config.sh be
+```
+
+2. Second is the [Shack](../shack/) IP. Default value is 192.168.2.1 :
+```bash
+$ sudo sh /tmp/pi-config.sh fr 10.0.5.1
 ```
 
 It should do :
