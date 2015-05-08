@@ -118,7 +118,7 @@ $ docker inspect dduportal/arm-nginx
   - 2nd is to specify the port (and the interface, and/or the level 3 protocol) to bind the forwarding to :
 
     ```bash
-    $ docker run --name=webserver -d -p 80:10.0.2.15:10080 dduportal/arm-nginx
+    $ docker run --name=webserver -d -p 10000:80 dduportal/arm-nginx
     ...
     $ docker port webserver
     80/tcp -> 10.0.2.15:10080
