@@ -1,10 +1,15 @@
 data:
-  build: ./dataCron/
+  build: ./data/
   volumes:
     - ./:/host-datadir
+    - ./www-data:/usr/share/nginx/html:ro
 backup:
-  build: ./dataCron/
+  build: ./data/
   command: true
+  volumes_from:
+    - data
+web:
+  image: nginx:1.9.0
   volumes_from:
     - data
 proxy:
