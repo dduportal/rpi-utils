@@ -7,16 +7,27 @@
 KBD_LAYOUT=${1-fr}
 SHACK_IP=${2-192.168.2.1}
 
+# Configure local proxy if explicitely provided
+if [ -n "${2}" ]; then
+	echo "Acquire::http::Proxy \"http://${SHACK_IP}:3128\";" | sudo tee /etc/apt/apt.conf.d/proxy
+fi
+
 set -e
 set -u
 
-# Configure local proxy (supposing it is on the provided IP)
-echo "Acquire::http::Proxy \"http://${SHACK_IP}:3128\";" | sudo tee /etc/apt/apt.conf.d/proxy
-
 # Update and upgrade safely packages (no kernel update !)
+export DEBIAN_FRONTEND noninteractive
 sudo apt-get update
 sudo apt-get -y dist-upgrade
-sudo apt-get install -y lxde git curl chromium
+sudo apt-get install -y --no-install-recommends lxde git curl chromium lightdm xserver-xorg
+
+# Autolog to the pi user at boot-startx
+sudo sed -i 's/#autologin-user=/autologin-user=pi/g' /etc/lightdm/lightdm.conf
+
+# Disable IPv6 and wireless net interfaces
+sudo sed -i '/inet6/d' /etc/network/interfaces
+sudo sed -i '/wlan/d' /etc/network/interfaces
+sudo sed -i '/wpa/d' /etc/network/interfaces
 
 # Disable (for tty) the kernel verbose messages
 sudo dmesg -n 1
