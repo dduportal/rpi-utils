@@ -48,7 +48,7 @@ Test by replacing UID/or/NAME by ```dduportal/rpi-alpine:edge```
   - "One shot" running : run a single command and then exit :
 
     ```
-	$ docker run dduportal/rpi-alpine echo "Hello World !"
+	$ docker run dduportal/rpi-alpine echo 'Hello World !'
 	```
   - "Interactive" : spawn a container and run a shell interactively inside :
 
