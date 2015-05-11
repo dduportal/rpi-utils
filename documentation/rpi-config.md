@@ -23,14 +23,14 @@ Note that a reboot is required. We'll do that at the end of the pre-configuratio
 
 The script will be downloaded and ran from the gateway :
 ```bash
-$ curl -L -o /tmp/pi-config.sh http://SHACK_IP/pi-config.sh
+$ curl -L -o /tmp/pi-config.sh http://192.168.2.1:6000/pi-config.sh
 $ sudo sh /tmp/pi-config.sh
 ```
 
 Optionaly you can change provide some parameters to the script :
 1. First parameter is the keyboard layout to use. Default is ```fr``` :
 ```bash
-$ sudo sh /tmp/pi-config.sh be
+$ sudo sh /tmp/pi-config.sh fr 192.168.2.1
 ```
 
 2. Second is the [Shack](../shack/) IP. Default value is 192.168.2.1 :
