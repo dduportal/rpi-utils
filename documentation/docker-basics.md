@@ -93,7 +93,7 @@ $ docker run -d --name webserver dduportal/arm-nginx:latest
 ...
 $ docker inspect --format '{{ .NetworkSettings.IPAddress }}' webserver
 172.17.0.15
-$ curl -I --no-proxy='*' http://172.17.0.15
+$ curl -I  http://172.17.0.15
 ...
 ```
 
