@@ -72,7 +72,7 @@ $ docker run -d dduportal/arm-redis:3.0.0
 ```bash
 $ docker run --name webserver -d dduportal/arm-nginx
 ...
-$ docker exec -ti webserver /bin/bash
+$ docker exec -ti webserver /bin/sh
 bash-4.3 # ps aux | grep nginx
 ...
 ```
