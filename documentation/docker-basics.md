@@ -87,8 +87,9 @@ bash-4.3 # ps aux | grep nginx
 
 ![Docker network](./graphs/docker_net.png)
 
-* By default, you can access your container from the host or another local cotnainer, using the container's direct IP :
-```bash
+* By default, you can access your container from the host or another local container, using the container's direct IP :
+
+  ```bash
 $ docker run -d --name webserver dduportal/arm-nginx:latest
 ...
 $ docker inspect --format '{{ .NetworkSettings.IPAddress }}' webserver
@@ -98,9 +99,10 @@ $ curl -I  http://172.17.0.15
 ```
 
 * Which port to use ? Seach for "Expose" in
-```bash
+
+  ```bash
 $ docker inspect dduportal/arm-nginx
-...
+```
 
 * If you want to give external access to your container, the preferred way is to use port forwarding :
   - 1st strategy is letting Docker select the port(s) to use :
@@ -326,27 +328,29 @@ my_app  latest  ID2 ...
 
 * Terminators commands :
   - Delete all containers existing on the host. (Running one will be ignored) :
-
+  
     ```bash
-    $ docker ps -a -q | xargs docker rm -v
-    ```
+$ docker ps -a -q | xargs docker rm -v
+```
 
   - Delete all images (referenced one won't be) :
 
     ```bash
-    $ docker images -q | xargs docker rmi
-    ```
+$ docker images -q | xargs docker rmi
+```
 
 ### Logging
 
 * Each container's stdout will be written in a log file on the host level :
-```bash
+
+  ```bash
 $ docker run -d dduportal/rpi-alpine:edge echo ok
 $ sudo cat /var/lib/docker/<CONT_ID>/log.json
 ```
 
 * There is docker command for that :
-```bash
+
+  ```bash
 $ docker run -d --name dbserver redis
 $ docker logs (-f) dbserver
 ```
@@ -363,7 +367,8 @@ $ docker logs (-f) dbserver
 * Given that the docker engine server expose a complete REST API, you can request it with any HTTP clien, and easily use docker client in java/python/go/ruby/etc.
 
 * You can manage a remote docker daemon, in remote servers, with a local client :
-```bash
+
+  ```bash
 $ docker ps
 ...
 $ docker -H tcp://ANOTHERIP:2375 ps
@@ -376,7 +381,8 @@ $ docker -H tcp://ANOTHERIP:2375 ps
 ### WTF ?
 
 * Inception !
-```bash
+
+  ```bash
 $ which docker
 /usr/local/bin/docker
 $ docker run -v $(which docker):$(which docker) -v /var/run/docker.sock:/var/run/docker.sock dduportal/rpi-alpine:edge docker ps
