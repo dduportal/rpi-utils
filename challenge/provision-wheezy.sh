@@ -1,5 +1,7 @@
 #/bin/sh
 
+# https://raw.githubusercontent.com/dduportal/rpi-utils/hypr-challenge/challenge/provision-wheezy.sh
+
 # Update pkg and install usefull tools
 apt-get update
 apt-get dist-upgrade -y
@@ -7,12 +9,13 @@ apt-get install -y --no-install-recommends \
 	git \
 	htop \
 	strace \
-	systat \
+	sysstat \
 	vim
 
 # Install latest docker
 curl -L -O http://downloads.hypriot.com/docker-hypriot_1.7.1-1_armhf.deb
 dpkg -i ./docker-hypriot_1.7.1-1_armhf.deb
+rm -f ./docker-hypriot_1.7.1-1_armhf.deb
 
 # Configure Docker
 /etc/init.d/docker stop
