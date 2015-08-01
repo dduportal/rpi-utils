@@ -15,10 +15,12 @@ while [  $COUNTER -lt $MAXNR ]; do
 
   docker run \
   	-d \
+  	--ulimit stack=256:256 \
+  	--ulimit nofile=1024:1024 \
   	--read-only \
   	--log-driver="none" \
   	--name=WebServer-$PORT \
   	-p 192.168.1.20:${PORT}:80 \
   		${DOCKER_IMAGE}
- 
+
 done
