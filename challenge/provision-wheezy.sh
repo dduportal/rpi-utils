@@ -28,11 +28,19 @@ echo > /etc/default/docker
 # No ipv6
 # No userland proxy : less processes
 # No container icc : no need to link
+
+# TO TRY : 
+ # --ip-forward=true                      Enable net.ipv4.ip_forward
+ # --ip-masq=true                         Enable IP masquerading
+ # --iptables=true                        Enable addition of iptables rules
+
 echo 'DOCKER_OPTS="--debug=false --storage-driver=overlay \
 	--userland-proxy=false -H tcp://0.0.0.0:2375 --ipv6=false \
 	--tlsverify=false --tls=false --log-level=info --icc=false \
 	--log-driver=none "' \
 	> /etc/default/docker
+
+
 # Remove ulimit from start script
 /etc/init.d/docker start
 /etc/init.d/rsyslog stop # Gain ~ 30 Mb of memory
