@@ -1,14 +1,12 @@
 #!/bin/bash 
 set -e
 
-#DOCKER_IMAGE="hypriot/rpi-nano-httpd"
-DOCKER_IMAGE="dduportal/rpi-nano-httpd"
+DOCKER_IMAGE="hypriot/rpi-nano-httpd:latest"
 P1=$1
 P2=$2
 MAXNR=${P1:="1"}
 STARTNR=${P2:="0"}
 
-docker build -t ${DOCKER_IMAGE} ./
 
 COUNTER=$STARTNR
 while [  $COUNTER -lt $MAXNR ]; do
@@ -22,6 +20,7 @@ while [  $COUNTER -lt $MAXNR ]; do
     --log-driver="none" \
     --name=WebServer-$PORT \
     --net=host \
-    ${DOCKER_IMAGE} ${PORT}
-
+    --ipc=host \
+    --uts=host \
+    ${DOCKER_IMAGE} /httpd ${PORT}
 done
