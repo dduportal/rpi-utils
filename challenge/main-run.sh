@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 set -e
 
 START_SCRIPT="./start.sh"
@@ -7,9 +7,10 @@ SYNC_INTERVAL=50
 TARGET=0
 COUNTER=0
 
-while [  true ]; do
+# $COUNTER -lt $MAXNR
+while [  $COUNTER -lt 2451 ]; do
   let TARGET=COUNTER+SYNC_INTERVAL
-  
+
   # launch a batch of containers
   echo "=== Launching a batch of containers : FROM ${COUNTER} to ${TARGET}"
   sh ${START_SCRIPT} ${TARGET} ${COUNTER}

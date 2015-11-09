@@ -5,8 +5,8 @@ DOCKER_VERSION=1.8.2
 export DOCKER_HOST=tcp://127.0.0.1:2375
 
 set -e
-set -u 
-set -x 
+set -u
+set -x
 
 # Update pkg and install usefull tools
 apt-get update
@@ -31,22 +31,25 @@ mkdir -p /etc/systemd/system/docker.service.d
 systemctl stop docker
 cat <<EOF >/etc/systemd/system/docker.service.d/custom-daemon-opts.conf
 [Service]
+LimitSIGPENDING=infinity
+LimitAS=infinity
 LimitNOFILE=infinity
 LimitNPROC=infinity
-LimitSTACK=32768
-Environment="GOGC=10"
+LimitSTACK=24576
+Environment=GODEBUG=gctrace=1 GOMAXPROCS=4 GOGC=1
 ExecStart=
 ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2375 \
-        --storage-driver=overlay \
-        --debug=false \
-        --userland-proxy=false \
-        --ipv6=false \
-        --log-level=info \
-        --log-driver=none \
-        --ip-forward=false \
-        --ip-masq=false \
-        --iptables=false \
-        --tls=false
+	--bridge=none \
+	--debug=false \
+	--iptables=false \
+	--ipv6=false \
+	--ip-forward=false \
+	--ip-masq=false \
+	--log-level=info \
+	--log-driver=none \
+	--storage-driver=overlay \
+	--tls=false \
+	--userland-proxy=false
 EOF
 systemctl daemon-reload
 systemctl start docker
@@ -71,6 +74,7 @@ systemctl enable docker
 systemctl disable avahi-daemon.service
 systemctl disable rsyslog.service
 systemctl disable syslog.service
+systemctl disable rng-tools.service
 systemctl disable ntp.service
 systemctl disable cron.service
 systemctl disable dhclient.service
@@ -78,7 +82,7 @@ systemctl disable dhclient.service
 # Add 1 Gb swap
 mkdir /data
 echo "Creating swap file, can take some times"
-dd if=/dev/zero of=/data/swapfile bs=1M count=1024
+dd if=/dev/zero of=/data/swapfile bs=1M count=2048
 mkswap /data/swapfile
 chmod 0600 /data/swapfile
 swapon /data/swapfile
@@ -88,10 +92,11 @@ mount -a
 
 # Tune system parameters
 cat <<EOF >/etc/sysctl.d/10-overcommit.conf
-vm.overcommit_memory = 2
-vm.overcommit_ratio = 100
+vm.overcommit_memory=2
+vm.overcommit_ratio=500
 vm.swappiness=100
 vm.oom-kill = 0
+vm.overcommit_kbytes=2097152
 EOF
 
 # Static IP
@@ -111,7 +116,6 @@ EOF
 # Use less memory as possible for gpu
 echo "gpu_mem 8" > /boot/config.txt
 
-
 # Configure Docker client
 echo "export DOCKER_HOST=${DOCKER_HOST}" > /etc/profile.d/docker.sh
 
@@ -122,4 +126,9 @@ echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4
 chmod 0700 /root/.ssh
 chmod 0600 /root/.ssh/authorized_keys
 
-reboot 
+# Install node exporter (provide metric endpoint for prometheus)
+curl -L -o ./node_exported.tgz https://github.com/prometheus/node_exporter/releases/download/0.12.0rc1/node_exporter-0.12.0rc1.linux-arm.tar.gz
+tar -C /usr/local/bin/ -xzf  ./node_exported.tgz
+rm -f ./node_exported.tgz
+
+reboot
