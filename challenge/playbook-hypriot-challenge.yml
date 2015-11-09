@@ -1,0 +1,13 @@
+---
+
+- name: Ansible Playbook for running the Hypriot Challenge on a Raspberry Pi 2
+
+  hosts: rpi2
+  roles:
+    - common
+    - tuned-system
+    - docker
+    # - tuned-docker
+    # - promeheus-node-exporter
+  remote_user: pi
+  sudo: yes

@@ -1,0 +1,2 @@
+- name: "docker | Ensure we have docker installed in a fixed version"
+  action: apt name=docker-hypriot=1.8.3-1 state=present install_recommends=no

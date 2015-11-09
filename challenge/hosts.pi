@@ -1,0 +1,2 @@
+[rpi2]
+192.168.1.20 ansible_user=pi ansible_become=yes ansible_ssh_pass=raspberry

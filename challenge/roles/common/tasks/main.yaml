@@ -1,0 +1,17 @@
+- name: "common | Ensure apt cache is up-to date"
+  action: apt update_cache=yes
+
+- name: "common | Ensure apt packages are fully up-to-date"
+  action: apt upgrade=full
+
+- name: "common | Ensure we have our sidekicq packages installed"
+  action: apt name={{ item }} state=present install_recommends=no
+  with_items:
+    - btrfs-tools
+    - lsof
+    - smem
+    - strace
+    - vim
+
+- name: "common | Ensure we have the default vagrant insecure key for ssh auth"
+  authorized_key: user=root key=https://github.com/mitchellh/vagrant/raw/master/keys/vagrant.pub state=present
