@@ -1,6 +1,15 @@
 # Play with Docker-compose
 
-Playing with Python :
+* Dockerfile :
+```
+FROM python:2.7
+ADD . /code
+WORKDIR /code
+RUN pip install -r requirements.txt
+CMD python app.py
+```
+
+* app.py :
 ```
 from flask import Flask
 from redis import Redis
@@ -18,4 +27,9 @@ def hello():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
+```
+* requirements.txt :
+```
+flask
+redis
 ```
