@@ -57,4 +57,9 @@ Then, connect all laptop by Wifi, to the configured Airport, and the Pis to the 
 If you want to check the cartography of network :
 * Use of ```nmap 192.168.2.0/24``` from any machine of this network
 * In MacOS, you can see the internal DHCP server leases in the file ```/private/var/db/dhcpd_leases```
-* Combination of both : check which adresses leased are still in use : ```grep ip_address /private/var/db/dhcpd_leases | cut -d= -f2 | nmap -iL - -sn ``` 
+* Combination of both : check which adresses leased are still in use : 
+  ```grep ip_address /private/var/db/dhcpd_leases | cut -d= -f2 | nmap -iL - -sn ``` 
+
+You can check that the laptops, once having a 192.168.2.x address distributed, can reach the web.
+
+#### ARM Boards OS configuration
