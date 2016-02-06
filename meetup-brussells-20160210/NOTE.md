@@ -64,3 +64,5 @@ If you want to check the cartography of network :
 You can check that the laptops, once having a 192.168.2.x address distributed, can reach the web.
 
 #### ARM Boards OS configuration
+
+Here are the "HypriotOS" base instructions to allow further configurations (manual or docker-machine)
