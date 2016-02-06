@@ -12,7 +12,7 @@ The building steps will follow the OSI stack methodology : layered, from hardwar
 ### Hardware setup
 #### Main nodes 
 Raspberry Pi or HypriotOs- compliant board. 
-* Each one must have a 8Go Sd card (or micro SD) with the latest HypriotOs dumped onto.
+* Each one must have a 8Go Sd card (or micro SD) with the latest HypriotOs (http://blog.hypriot.com/downloads/) dumped onto.
 * We will use wired Ethernet to connect to network
 * AC will be provided by the micro-USB port
 * No keyboard/mouse/hdmi/screen needed
@@ -39,3 +39,22 @@ We will use a Mac laptop as Shack machine :
 * airport (integrated wifi) will be used to share private network for laptop
 * Usb-ethernet adaptor for wired connectivity
 * A Mac Os compatible Usb dongle for wifi (web access )
+
+### Logical setup
+
+This part will take care of explaining steps in details for the logical part
+
+#### Network
+
+The Shack must be started, connected, and have its network sharing ability enabled :
+* IP forwarding from Web interface to all others
+* DHCP server started
+
+In our case, we will use Mac OS Internet sharing ability that will create a virtual private network ( by default 192.168.2.0/24) across multiple physical network, which is perfect for us. Do not forget to configure a password for airport sharing.
+
+Then, connect all laptop by Wifi, to the configured Airport, and the Pis to the wired network.
+
+If you want to check the cartography of network :
+* Use of ```nmap 192.168.2.0/24``` from any machine of this network
+* In MacOS, you can see the internal DHCP server leases in the file ```/private/var/db/dhcpd_leases```
+* Combination of both : check which adresses leased are still in use : ```grep ip_address /private/var/db/dhcpd_leases | cut -d= -f2 | nmap -iL - -sn ``` 
