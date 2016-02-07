@@ -97,7 +97,7 @@ Shack must provide those services :
 #### ARM Boards OS configuration
 
 Here are the "HypriotOS" base instructions to allow further configurations
-(manual or docker-machine).
+(manual or docker-machine).m
 
 First step is to connect to the machine, and do the minimalistic
 configuration possible :
@@ -165,7 +165,7 @@ on `<Ip of pi master>`. Launch it with :
 
 * Pull latest swarm docker image arm 1.1.0 from local registry
 * Launch swarm agent with join :
-  `docker run -d --restart=always --name=swarm-agent hypriot/rpi-swarm join consul://<Ip of pi master>:8500`
+  `docker run -d --restart=always --name=swarm-agent  hypriot/rpi-swarm:1.1.0 join --advertise $(ip addr|awk '/eth0/ && /inet/ {gsub(/\/[0-9][0-9]/,""); print $2}'):2375 consul://<Ip of pi master>:8500`
 * Check the logs !
 * Check in consul UI in Key/Value, docker -> swarm -> nodes
 
