@@ -80,6 +80,20 @@ file ```/private/var/db/dhcpd_leases```
 You can check that the laptops, once having a 192.168.2.x address
 distributed, can reach the web.
 
+
+#### Shack configuration
+
+Shack must provide those services :
+* Local Docker private registry with the images preloaded on `192.168.2.1:5000`
+  * Voting app demo images (5) : postgres, result, voting, hypriot/rpi-redis and worker
+  * hypriot/rpi-alpine-scratch to playground
+  * hypriot/rpi-swarm:1.1.0 to try latest swarm
+* HTTP server on http://192.168.2.1 used to provide local downloads for :
+  * Vagrant ssh keys (pub and priv)
+  * docker-machine binaries with hypriot driver
+  * MAYBE ?? docker-compose and docker-hypriot latest packages
+
+
 #### ARM Boards OS configuration
 
 Here are the "HypriotOS" base instructions to allow further configurations
@@ -99,6 +113,8 @@ I propose to use vagrant insecure key for now :
     `curl -L -o ~/.ssh/id_vagrant_insecure https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant`
   * Test by remotely rebooting the pi with ssh. From you laptop :
     `ssh -i ~/.ssh/id_vagrant_insecure pi@<IP OF YOUR PI> sudo reboot now`
+
+#### Docker engine configuration
 
 WIP : Idea is to use the docker-machine with the driver hypriot from
 (https://docs.docker.com/machine/reference/config/).
@@ -123,10 +139,39 @@ used for caching, from the shack
 * Daemon listening to HTTP : `-H tcp://0.0.0.0:2375`
 (needed for remote docker commands)
 * Configure the overlay network capability using the `--cluster-store` option.
-It will use the `consul://192.168.2.1:8500` address to use the consul server of
+It will use the `consul://<Ip of pi master>:8500` address to use the consul server of
 the shack. It must be used in conjunction with `--cluster-advertise=eth0:2375`
 * [Not mandatory - maybe to try the new config hot-reload for daemon] :
 Configure the labels used for this engine
 
 Even if docker-machine has capabilities for swarm, i want us to use "manual"
 bootstrap to understand well how it works. So no more configuration are needed.
+
+#### Swarm configuration
+TODO
+##### A bit of organization
+We need to make Pis working by 3 at least :
+* a master node that will run consul and swarm manager
+* 2 (or more) nodes that will run the containers
+* The nodes will be used as swarm backups manager in case of failure
+to demonstrate HA capability
+
+Start consul server consul server on the master with UI
+on `<Ip of pi master>`. Launch it with :
+  `docker run -d --net=host hypriot/rpi-consul agent -dev -ui -ui-dir=<PATH TO UI DIR>
+   -advertise <Ip of pi master> -bind <Ip of pi master> -client <Ip of pi master>`
+
+##### Agents
+
+* Pull latest swarm docker image arm 1.1.0 from local registry
+* Launch swarm agent with join :
+  `docker run -d --restart=always --name=swarm-agent hypriot/rpi-swarm join consul://<Ip of pi master>:8500`
+* Check the logs !
+* Check in consul UI in Key/Value, docker -> swarm -> nodes
+
+##### Manager
+* Launch swarm manager on the master pi :
+ `docker run -d -p 10000:6000 hypriot/rpi-swarm -H 0.0.0.0:6000 consul://<Ip of pi master>:8500 `
+* Check the logs !
+* Test it from laptop :
+ `docker -H <Ip of pi master>:10000 info`
