@@ -85,7 +85,8 @@ distributed, can reach the web.
 
 Shack must provide those services :
 * Local Docker private registry with the images preloaded on `192.168.2.1:5000`
-  * Voting app demo images (5) : postgres, result, voting, hypriot/rpi-redis and worker
+  * Voting app demo images (5) : postgres, result, voting, hypriot/rpi-redis
+and worker
   * hypriot/rpi-alpine-scratch to playground
   * hypriot/rpi-swarm:1.1.0 to try latest swarm
 * HTTP server on http://192.168.2.1 used to provide local downloads for :
@@ -97,22 +98,33 @@ Shack must provide those services :
 #### ARM Boards OS configuration
 
 Here are the "HypriotOS" base instructions to allow further configurations
-(manual or docker-machine).m
+(manual or docker-machine).
 
-First step is to connect to the machine, and do the minimalistic
-configuration possible :
-* Default user/password can be pi/raspberry or root/hypriot
-* Edit /boot/occidentalis to ensure you have a uniq hostname instead of
-black-pearl (Need a reboot to be applied)
-* Add a ssh key pair to avoid typing password in future command.
-I propose to use vagrant insecure key for now :
-  * From https://github.com/mitchellh/vagrant/tree/master/keys
-  * Add public key to your Pi machine :
-    `curl --silent -L https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant.pub >> /home/pi/.ssh/authorized_keys`
-  * Add private key to you laptop :
-    `curl -L -o ~/.ssh/id_vagrant_insecure https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant`
-  * Test by remotely rebooting the pi with ssh. From you laptop :
-    `ssh -i ~/.ssh/id_vagrant_insecure pi@<IP OF YOUR PI> sudo reboot now`
+* First, We need SSH in passwordless with root :
+  1. You have to copy an ssk public key into the Pi. We'll use the
+vagrant insecure key for the meetup to allow cross ssh in case of problems :
+  ```
+  # Default password of root is 'hypriot'
+  $ ssh root@<IP OF YOUR PI> "mkdir /root/.ssh"
+  $ ssh root@<IP OF YOUR PI> "curl --silent -L https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant.pub >> /root/.ssh/authorized_keys"
+  ```
+  2. Download the insecure private key on your laptop :
+  ```
+  $ curl -L -o ~/.ssh/vagrant_insecure_id https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant
+  $ chmod 0600 ~/.ssh/vagrant_insecure_id
+  ```
+  3. Test it :
+  ```
+  $ ssh -i ~/.ssh/vagrant_insecure_id root@<IP OF YOUR PI> "hostname"
+  ```
+* Then we MUST configure the hostname of the PI :
+  1. On your PI, edit the file `/boot/occidentalis.txt`, replace "black-pearl"
+by an uniq hostname. Do not hesitate to use a pun :)
+  2. Reboot your pi :
+  ```
+  $ ssh -i ~/.ssh/vagrant_insecure_id root@<IP OF YOUR PI> "reboot now"
+  ```
+
 
 #### Docker engine configuration
 
