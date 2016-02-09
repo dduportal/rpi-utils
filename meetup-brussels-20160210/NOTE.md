@@ -113,9 +113,14 @@ vagrant insecure key for the meetup to allow cross ssh in case of problems :
   $ curl -L -o ~/.ssh/vagrant_insecure_id https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant
   $ chmod 0600 ~/.ssh/vagrant_insecure_id
   ```
-  3. Test it :
+  3. Test it by upgrading docker and compose to latest versions :
   ```
-  $ ssh -i ~/.ssh/vagrant_insecure_id root@<IP OF YOUR PI> "hostname"
+  $ ssh -i ~/.ssh/vagrant_insecure_id root@<IP OF YOUR PI>
+  HypriotOS: root@black-pearl in ~
+  $ apt-get update
+  ...
+  HypriotOS: root@black-pearl in ~
+  $ apt-get install --only-upgrade docker-hypriot docker-compose
   ```
 * Then we MUST configure the hostname of the PI :
   1. On your PI, edit the file `/boot/occidentalis.txt`, replace "black-pearl"
@@ -128,36 +133,30 @@ by an uniq hostname. Do not hesitate to use a pun :)
 
 #### Docker engine configuration
 
-WIP : Idea is to use the docker-machine with the driver hypriot from
-(https://docs.docker.com/machine/reference/config/).
-We have to "Create" a docker-machine from your laptop with
-some custom docker configurations.
+No Docker-machine used here : we do not have any binary for Windows users for
+Hypriot driver.
 
-Docker-machine have a set of practical commands to help us configuring
-the docker engines :
-* `create` (create a new remote docker machine, with the flag --engine-opt) :
-https://docs.docker.com/machine/reference/create/
-* `config` (show the remote docker engine configuration):
-https://docs.docker.com/machine/reference/config/
-* `provision` (Re-apply configuration in case of problem ):
-https://docs.docker.com/machine/reference/provision/
+We have to configure the items below inside the Docker daemon.
+As root on your Pi :
 
-Docker Engine configurations flags can be reviewed from the documentation :
-https://docs.docker.com/engine/reference/commandline/daemon/
+1. First stop the docker service : ```systemctl stop docker```
+2. Then edit the file `/etc/default/docker`, and to the **DOCKER_OPTS** key :
+  * Insecure access to the local shack private registry used for caching :
+  ```
+  --insecure-registry 192.168.2.1:5000
+  ```
+  * Daemon listening to HTTP (needed for remote docker commands) :
+  ```
+  -H tcp://0.0.0.0:2375
+  ```
+  * Configure the multi-host network capability :
+  ```
+  --cluster-store consul://192.168.2.1:8500 --cluster-advertise=eth0:2375
+  ```
+3. Start the docker daemon again ```systemctl stop docker```
 
-What has to be configured :
-*  Insecure access to the local private registry (http://192.168.2.1:5000)
-used for caching, from the shack
-* Daemon listening to HTTP : `-H tcp://0.0.0.0:2375`
-(needed for remote docker commands)
-* Configure the overlay network capability using the `--cluster-store` option.
-It will use the `consul://<Ip of pi master>:8500` address to use the consul server of
-the shack. It must be used in conjunction with `--cluster-advertise=eth0:2375`
-* [Not mandatory - maybe to try the new config hot-reload for daemon] :
-Configure the labels used for this engine
+4. Check you settings with ```docker info```
 
-Even if docker-machine has capabilities for swarm, i want us to use "manual"
-bootstrap to understand well how it works. So no more configuration are needed.
 
 #### Swarm configuration
 TODO
