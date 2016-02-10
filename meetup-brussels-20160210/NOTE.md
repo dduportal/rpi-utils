@@ -100,7 +100,24 @@ and worker
 Here are the "HypriotOS" base instructions to allow further configurations
 (manual or docker-machine).
 
-* First, We need SSH in passwordless with root :
+* First,  you should ssh to the machine and become root user.
+* Then , upgrade to latest doker and docker-compose :
+  ```
+  HypriotOS: root@black-pearl in ~
+  $ apt-get update
+  ...
+  HypriotOS: root@black-pearl in ~
+  $ apt-get install --only-upgrade docker-hypriot docker-compose
+  ```
+* Then we MUST configure the hostname of the PI :
+  1. On your PI, edit the file `/boot/occidentalis.txt`, replace "black-pearl"
+by an **uniq** hostname. Do not hesitate to use a pun :)
+  2. Reboot your pi :
+  ```
+  $ ssh -i ~/.ssh/vagrant_insecure_id root@<IP OF YOUR PI> "reboot now"
+  ```
+
+In you are interested, you can go ssh-passwordless (use case : docker-machine) :
   1. You have to copy an ssk public key into the Pi. We'll use the
 vagrant insecure key for the meetup to allow cross ssh in case of problems :
   ```
@@ -113,23 +130,10 @@ vagrant insecure key for the meetup to allow cross ssh in case of problems :
   $ curl -L -o ~/.ssh/vagrant_insecure_id https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant
   $ chmod 0600 ~/.ssh/vagrant_insecure_id
   ```
-  3. Test it by upgrading docker and compose to latest versions :
+  3. Test it by upgrading showing the remote hostname :
   ```
-  $ ssh -i ~/.ssh/vagrant_insecure_id root@<IP OF YOUR PI>
-  HypriotOS: root@black-pearl in ~
-  $ apt-get update
-  ...
-  HypriotOS: root@black-pearl in ~
-  $ apt-get install --only-upgrade docker-hypriot docker-compose
+  $ ssh -i ~/.ssh/vagrant_insecure_id root@<IP OF YOUR PI> "hostname"
   ```
-* Then we MUST configure the hostname of the PI :
-  1. On your PI, edit the file `/boot/occidentalis.txt`, replace "black-pearl"
-by an uniq hostname. Do not hesitate to use a pun :)
-  2. Reboot your pi :
-  ```
-  $ ssh -i ~/.ssh/vagrant_insecure_id root@<IP OF YOUR PI> "reboot now"
-  ```
-
 
 #### Docker engine configuration
 
