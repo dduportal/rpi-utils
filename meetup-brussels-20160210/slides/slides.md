@@ -18,20 +18,19 @@ class: center, middle
 # Welcome to the meetup !
 ## How to quickly bootstrap ?
 
-1. If not already done, flash you SD card with the 0.6.1 Hector image
+1. Connect your laptop to the shared Wifi "Dadou’s MacBook Air" (dockerbel)
 
-2. Connect your laptop to the shared Wifi "Dadou’s MacBook Air" (dockerbel)
+2. Insert the SD card (previously flashed), connect the Pi to Ethernet and
+power it with micro-USB
 
-3. Insert the SD card, connect the Pi to Ethernet and power it with micro-USB
+3. Come at the "shack" to tell us which hostname you want to use. Be creative !
 
-4. Come at the "shack" to tell us which hostname you want to use. Be creative !
+4. After we have configured your hostname, ssh to your host :
+  ```
+  $ ssh root@<your hostname>.local # Password is hypriot
+  ```
 
-5. After we have configured your hostname, ssh to your host :
-  * User : root
-  * password : hypriot
-  * Hostname : <you hostname>.local
-
-6. Upgrade embedded docker tools :
+5. Upgrade embedded docker tools :
   ```
   $ apt-get update && apt-get install --only-upgrade docker-hypriot docker-compose
   ```
@@ -52,7 +51,7 @@ class: center, middle
 * We want to launch the Docker demo "voting app" on a cluster of Raspberry Pis.
   - Docker on ARM board ? Voting app ?
 
-* This voting app will be launch on Swarm cluster.
+* This voting app will be launched on Swarm cluster.
   - How to bootstrap Swarm ?
 
 * Workshop logistic : we'll group by 3 boards : 1 master, 2 nodes
@@ -61,46 +60,9 @@ class: center, middle
 ---
 
 # Now let's workshop !
-## [Voting app](https://github.com/docker/example-voting-app) 1/2
+[Docker Voting app](https://github.com/docker/example-voting-app)
 
 ![Diagram](img/voting-app.png)
-
----
-
-# Now let's workshop !
-## [Voting app](https://github.com/docker/example-voting-app) 2/2 - Simplified view :
-
-```
-services:
-  voting-app:
-    build: ./voting-app/.
-    ports:
-      - "5000:80"
-    links:
-      - redis
-
-  result-app:
-    build: ./result-app/.
-    ports:
-      - "5001:80"
-    links:
-      - db
-
-  worker:
-    build: ./worker
-    links:
-      - db
-      - redis
-
-  redis:
-    image: redis
-    ports: ["6379"]
-
-  db:
-    image: postgres:9.4
-    volumes:
-      - "db-data:/var/lib/postgresql/data"
-```
 
 ---
 
@@ -110,12 +72,14 @@ services:
 HypriotOS helps us to run Docker : easy !
 ```
 $ docker -v
+Docker version 1.10.0, build 590d5108
 ```
+
 but which image to run ?
 
 ```
 $ docker run -ti --rm alpine:latest sh
-... ERROR ...
+exec format error
 ```
 
 You have 2 good starting points :
@@ -143,3 +107,22 @@ git clone https://github.com/jmMeessen/rpi-voting-app
 * Extended by `dev-compose.yml` that will build images from sources
 
 * Another extending with `workshop.yml` that will use a local private registry
+
+---
+
+# Now let's workshop !
+## Physical architecture :
+
+![phys-arch](./img/physical-arch.png)
+
+---
+* Start consul :
+/consul agent -dev -ui -ui-dir=/web-ui -advertise=192.168.2.8 -bind=192.168.2.8 -client=192.168.2.8
+
+
+
+---
+
+* Stop docker :
+systemctl stop docker
+* Edit /etc/default/docker
