@@ -111,18 +111,92 @@ git clone https://github.com/jmMeessen/rpi-voting-app
 ---
 
 # Now let's workshop !
-## Physical architecture :
+## Target Physical architecture :
 
 ![phys-arch](./img/physical-arch.png)
 
 ---
-* Start consul :
-/consul agent -dev -ui -ui-dir=/web-ui -advertise=192.168.2.8 -bind=192.168.2.8 -client=192.168.2.8
 
+# Now let's workshop !
+## Step 1 : Master configuration
 
+We need a Key-Value Store with discovering abilities. We'll use **consul**.
+(Alternatives : etcd, zooKeeper).
+
+2 types of data will be stored :
+* Docker virtual networks (from Docker engines)
+* Swarm nodes (from Swarm agent)
+
+Start consul on your master Pi (using docker for convenience) :
+```
+$ docker run -d --net=host --restart=always --name=consul hypriot/rpi-consul \
+  agent -dev -ui -ui-dir=/ui -advertise=<Master IP> -bind=<Master IP> \
+  -client=<Master IP>
+$ docker logs consul
+```
+
+GUI is available at `http://<Master IP>:8500`
 
 ---
 
-* Stop docker :
-systemctl stop docker
-* Edit /etc/default/docker
+# Now let's workshop !
+## Step 1 : Nodes docker engines configurations
+
+On each of your **nodes** :
+
+* Add those items to the line with **DOCKER_OPTS** in `/etc/default/docker` :
+  - Insecure access to the local shack private registry used for caching :
+  ```
+  --insecure-registry 192.168.2.1:5000
+  ```
+  * Daemon listening to HTTP (needed for remote docker commands) :
+  ```
+  -H tcp://0.0.0.0:2375
+  ```
+  * Configure the multi-host network capability :
+  ```
+  --cluster-store consul://<PI MASTER IP>:8500 --cluster-advertise=eth0:2375
+  ```
+* Restart docker : `systemctl restart docker`
+* Check with `docker info` and `ps aux | grep docker`
+
+---
+
+# Now let's workshop !
+## Step 1 : State of the infrastructure
+
+![Step 1](./img/state-infra-01.png)
+
+---
+
+# Now let's workshop !
+## Step 2 : Start Swarm - agents
+
+We need to start by launching "Swarm agents" on each node.
+
+Their goals will be :
+* Register to consul as "Swarm nodes"
+* Regularly report their good health to consul
+
+The commands (use an image locally stored):
+
+```
+$ export MY_IP=$(ip addr|awk '/eth0/ && /inet/ {gsub(/\/[0-9][0-9]/,""); print $2}')
+
+$ docker run -d --restart=always --name=swarm-agent 192.168.2.1:5000/swarm \
+  join -advertise ${MY_IP}:2375 consul://<MASTER IP>:8500
+
+$ docker logs -f swarm-agent
+```
+
+---
+
+# Now let's workshop !
+## Step 2 : Start Swarm - master
+
+Now, time to launch the master.
+
+Its goals will be :
+* Provide an HTTP Docker API that will serve as Proxy for your docker commands
+* Retrieve and regularly update a list of Docker remote nodes
+* Orchestrate the docker commands it will received
