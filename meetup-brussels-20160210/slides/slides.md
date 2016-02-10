@@ -162,8 +162,7 @@ On each of your **nodes** :
 
 ---
 
-# Now let's workshop !
-## Step 1 : State of the infrastructure
+# Step 1 : State of the infrastructure
 
 ![Step 1](./img/state-infra-01.png)
 
@@ -178,7 +177,7 @@ Their goals will be :
 * Register to consul as "Swarm nodes"
 * Regularly report their good health to consul
 
-The commands (use an image locally stored):
+The commands (use an image locally stored) to run on **each** node :
 
 ```
 $ export MY_IP=$(ip addr|awk '/eth0/ && /inet/ {gsub(/\/[0-9][0-9]/,""); print $2}')
@@ -199,4 +198,57 @@ Now, time to launch the master.
 Its goals will be :
 * Provide an HTTP Docker API that will serve as Proxy for your docker commands
 * Retrieve and regularly update a list of Docker remote nodes
-* Orchestrate the docker commands it will received
+* Orchestrate the docker commands it will receive
+
+The commands (use an image locally stored) to run on the master Pi :
+```
+$ docker run -d -p 10000:6000 192.168.2.1:5000/swarm manage \
+  -H 0.0.0.0:6000 consul://<MASTER PI IP>:8500
+```
+
+---
+
+# Step 2 : State of the infrastructure
+
+![Step 2](./img/state-infra-02.png)
+
+
+---
+
+# Now let's workshop !
+## Step 2 : a bit of testing
+
+* Test the Swarm cluster from your laptop (read carefully) :
+```
+$ export DOCKER_HOST=tcp://<MASTER PI IP>:10000
+$ docker info
+...
+```
+* Create an overlay network across the swarm cluster :
+```
+$ docker network ls
+...
+$ docker network create --driver=overlay test-net-01
+...
+$ docker network ls
+...
+```
+
+---
+
+# Now let's workshop !
+## Step 3 : Docker compose
+
+* From your laptop, you need docker-compose >= 1.6.0
+(https://docs.docker.com/compose/install/)
+
+* Git clone / download this repository :
+https://github.com/jmMeessen/rpi-voting-app
+
+* Launch the voting-app using the "private registry" settings :
+```
+$ cd vote-apps
+$ docker-compose -f meetup.yml up
+```
+
+* Then check logs and test on 5000 and 5001 ports !
