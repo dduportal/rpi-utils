@@ -1,0 +1,52 @@
+version: '2'
+
+services:
+  voting-app:
+    image: 192.168.2.1:5000/rpi-voting-app:latest
+    ports:
+      - "5000:80"
+    links:
+      - redis
+    networks:
+      - front-tier
+      - back-tier
+
+  redis:
+    image: 192.168.2.1:5000/rpi-redis:latest
+    expose: ["6379"]
+    networks:
+      - back-tier
+
+  worker:
+    image: 192.168.2.1:5000/rpi-worker:latest
+    links:
+      - db
+      - redis
+    networks:
+      - back-tier
+
+  db:
+    image: 192.168.2.1:5000/postgres-arm:latest
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - back-tier
+
+  result-app:
+    image: 192.168.2.1:5000/rpi-result-app:latest
+    ports:
+      - "5001:80"
+    links:
+      - db
+    networks:
+      - front-tier
+      - back-tier
+
+volumes:
+  db-data: {}
+
+networks:
+  front-tier:
+    driver: overlay
+  back-tier:
+    driver: overlay
